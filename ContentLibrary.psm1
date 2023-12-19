@@ -682,18 +682,27 @@ Function New-OVF {
 
     $sourceVMId = ((Get-VM -Name $SourceVMName).ExtensionData.MoRef).Value
     $sourceVMType = ((Get-VM -Name $SourceVMName).ExtensionData.MoRef).Type
-    $libraryId = ((Get-ContentLibrary -LibraryName $LibraryName).Id).Value
+    $libraryId = (Get-ContentLibrary -Name $LibraryName).Id
 
-    $ovfCreateSpec =  $ovfService.Help.create.spec.Create()
-    $ovfCreateSpec.source.id = $sourceVMId
-    $ovfCreateSpec.source.type = $sourceVMType
+    $ovfCreateSpec = $ovfService.Help.create.create_spec.Create()
+    $ovfSource = $ovfService.Help.create.source.Create()
+    $ovfTarget = $ovfService.Help.create.target.Create()
+
+    $ovfSource.id = $sourceVMId
+    $ovfSource.type = $sourceVMType
+
+    $UniqueChangeId = [guid]::NewGuid().tostring()
+
     $ovfCreateSpec.name = $OVFName
     $ovfCreateSpec.description = $Description
-    $ovfCreateSpec.flags = [""]
-    $ovfCreateSpec.target.library_id = $libraryId
+    $ovfCreateSpec.flags = "","EXTRA_CONFIG"
+
+    $ovfTarget.library_id = $libraryId
 
     Write-Host "`nCreating new OVF Template from $SourceVMName in Content Library $LibraryName ..."
-    $result = $ovfService.create($ovfCreateSpec)
+
+    $libraryTemplateId = $ovfService.create($UniqueChangeId,$ovfSource,$ovfTarget,$ovfCreateSpec)
+
 }
 
 Function New-VMFromVMTX {
