@@ -669,7 +669,7 @@ Function New-OVF {
     .PARAMETER LibraryName
         The name of the Content Library to clone to
     .EXAMPLE
-        New-OVF -SourceVMName "Windows10-BaseInstall" -OVFName "Windows10-OVF-Template" -LibraryName "VMC-CL-01"
+        New-OVF -SourceVMName "Windows10-BaseInstall" -OVFName "Windows10-OVF-Template" -Description "test VM template" -LibraryName "VMC-CL-01"
 #>
     param(
         [Parameter(Mandatory=$true)][String]$SourceVMName,
@@ -682,7 +682,7 @@ Function New-OVF {
 
     $sourceVMId = ((Get-VM -Name $SourceVMName).ExtensionData.MoRef).Value
     $sourceVMType = ((Get-VM -Name $SourceVMName).ExtensionData.MoRef).Type
-    $libraryId = (Get-ContentLibrary -Name $LibraryName).Id
+    $libraryId = (Get-ContentLibrary -LibraryName $LibraryName).Id
 
     $ovfCreateSpec = $ovfService.Help.create.create_spec.Create()
     $ovfSource = $ovfService.Help.create.source.Create()
