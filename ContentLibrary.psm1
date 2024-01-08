@@ -682,7 +682,7 @@ Function New-OVF {
 
     $sourceVMId = ((Get-VM -Name $SourceVMName).ExtensionData.MoRef).Value
     $sourceVMType = ((Get-VM -Name $SourceVMName).ExtensionData.MoRef).Type
-    $libraryId = (Get-ContentLibrary -LibraryName $LibraryName).Id
+    $libraryId = (Get-ContentLibrary -Name $LibraryName).Id
 
     $ovfCreateSpec = $ovfService.Help.create.create_spec.Create()
     $ovfSource = $ovfService.Help.create.source.Create()

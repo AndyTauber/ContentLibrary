@@ -1,0 +1,35 @@
+#Connect to vCenter and API server
+Connect-VIServer -Server vc-l-01a.corp.local -User administrator@vsphere.local -Password VMware1!
+Connect-CISServer -Server vc-l-01a.corp.local -User administrator@vsphere.local -Password VMware1!
+
+#set variables
+$SourceVMName = ""
+$LibraryName = ""
+$Description = ""
+
+#Connect to the correct API service
+$ovfService = Get-CisService -Name "com.vmware.vcenter.ovf.library_item"
+
+#Get VM info
+$sourceVMId = ((Get-VM -Name $SourceVMName).ExtensionData.MoRef).Value
+$sourceVMType = ((Get-VM -Name $SourceVMName).ExtensionData.MoRef).Type
+
+#Get Content Library info
+$libraryId = (Get-ContentLibrary -Name $LibraryName).Id
+
+$ovfCreateSpec = $ovfService.Help.create.create_spec.Create()
+$ovfSource = $ovfService.Help.create.source.Create()
+$ovfTarget = $ovfService.Help.create.target.Create()
+
+$ovfCreateSpec.name = $OVFName
+$ovfCreateSpec.description = $Description
+$ovfCreateSpec.flags = "","EXTRA_CONFIG"
+
+$ovfSource.id = $sourceVMId
+$ovfSource.type = $sourceVMType
+
+$ovfTarget.library_id = $libraryId
+
+$UniqueChangeId = [guid]::NewGuid().tostring()
+
+$libraryTemplateId = $ovfService.create($UniqueChangeId,$ovfSource,$ovfTarget,$ovfCreateSpec)
